@@ -70,7 +70,7 @@ if [[ -z "$NO_HOST_KERBEROS_DIRECTORY" && ! -z "$HOST_KERBEROS_DIRECTORY" ]]; th
   MOUNTPARAMS="-v $HOST_KERBEROS_DIRECTORY:/etc/krb5kdc"
 else
   # Docker will choose where it wants to put it on the host.
-  # Use docker inspect bidms-postgresql to find out where.
+  # Use docker inspect bidms-kerberos to find out where.
   echo "HOST_KERBEROS_DIRECTORY not set.  Using docker default."
 fi
 

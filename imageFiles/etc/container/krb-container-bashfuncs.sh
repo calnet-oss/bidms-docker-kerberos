@@ -26,11 +26,11 @@
 # 
 
 function container_startup {
-  if [ -e /etc/krb5kdc/shuttingdown ]; then
-    rm /etc/krb5kdc/shuttingdown
+  if [ -e /v1/shuttingdown ]; then
+    rm /v1/shuttingdown
   fi
-  if [ -e /etc/krb5kdc/cleanshutdown ]; then
-    rm /etc/krb5kdc/cleanshutdown
+  if [ -e /v1/cleanshutdown ]; then
+    rm /v1/cleanshutdown
   fi
   /usr/sbin/syslogd
   /etc/init.d/krb5-kdc start
@@ -38,13 +38,13 @@ function container_startup {
 }
 
 function container_shutdown {
-  touch /etc/krb5kdc/shuttingdown
+  touch /v1/shuttingdown
   /etc/init.d/krb5-admin-server stop
   /etc/init.d/krb5-kdc stop
   echo ""
   kill -TERM $(cat /var/run/syslog.pid)
-  echo "Processes still running after shutdown:" > /etc/krb5kdc/cleanshutdown
-  ps -uxaw >> /etc/krb5kdc/cleanshutdown
-  rm /etc/krb5kdc/shuttingdown
+  echo "Processes still running after shutdown:" > /v1/cleanshutdown
+  ps -uxaw >> /v1/cleanshutdown
+  rm /v1/shuttingdown
   exit
 }

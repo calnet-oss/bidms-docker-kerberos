@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONTAINER_DIR="/etc/krb5kdc"
+CONTAINER_DIR="/v1"
 INSPECT=$(docker inspect bidms-kerberos | sed -e '/Source/,/Destination/!d')
 
 while read -ra arr; do

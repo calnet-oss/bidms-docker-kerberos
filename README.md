@@ -31,7 +31,7 @@ chmod 600 imageFiles/tmp_passwords/kdc_master_pw \
   imageFiles/tmp_passwords/kdc_admin/pw
 ```
 
-Make sure the `HOST_KERBEROS_DIRECTORY` directory specified in `config.env`
+Make sure the `HOST_VOLUME_DIRECTORY` directory specified in `config.env`
 does not exist yet on your host machine so that the build script will
 initialize your directory, unless you're running `buildImage.sh` subsequent
 times and want to keep your existing directory.
@@ -76,18 +76,18 @@ docker ps
 
 ## Kerberos Persistence
 
-Docker will mount the host directory specified in `HOST_KERBEROS_DIRECTORY`
-from `config.env` within the container as `/etc/krb5kdc` and this is how the
+Docker will mount the host directory specified in `HOST_VOLUME_DIRECTORY`
+from `config.env` within the container as `/v1` and this is how the
 Kerberos data files are persisted across container runs.
 
 As mentioned in the build image step, the `buildImage.sh` script will
 initialize an default Kerberos instance as long as the
-`HOST_KERBEROS_DIRECTORY` directory doesn't exist yet on the host at the
+`HOST_VOLUME_DIRECTORY` directory doesn't exist yet on the host at the
 time `buildImage.sh` is run.  Subsequent runs of `buildImage.sh` will not
 re-initialize Kerberos if the directory already exists on the host.
 
 If you plan on running the image on hosts separate from the machine you're
 running the `buildImage.sh` script on then you'll probably want to let
 `buildImage.sh` initialize the Kerberos host directory and then copy the
-`HOST_KERBEROS_DIRECTORY` to all the machines that you will be running the
+`HOST_VOLUME_DIRECTORY` to all the machines that you will be running the
 image on.  When copying, be careful about preserving file permissions.

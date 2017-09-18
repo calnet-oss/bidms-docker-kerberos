@@ -65,13 +65,13 @@ else
   exit 1
 fi
 
-if [[ -z "$NO_HOST_KERBEROS_DIRECTORY" && ! -z "$HOST_KERBEROS_DIRECTORY" ]]; then
-  echo "HOST_KERBEROS_DIRECTORY=$HOST_KERBEROS_DIRECTORY"
-  MOUNTPARAMS="-v $HOST_KERBEROS_DIRECTORY:/etc/krb5kdc"
+if [[ -z "$NO_HOST_VOLUME_DIRECTORY" && ! -z "$HOST_VOLUME_DIRECTORY" ]]; then
+  echo "HOST_VOLUME_DIRECTORY=$HOST_VOLUME_DIRECTORY"
+  MOUNTPARAMS="-v $HOST_VOLUME_DIRECTORY:/v1"
 else
   # Docker will choose where it wants to put it on the host.
   # Use docker inspect bidms-kerberos to find out where.
-  echo "HOST_KERBEROS_DIRECTORY not set.  Using docker default."
+  echo "HOST_VOLUME_DIRECTORY not set.  Using docker default."
 fi
 
 if [[ -z "$NO_INTERACTIVE" && -z "$INTERACTIVE_PARAMS" ]]; then

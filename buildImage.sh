@@ -71,18 +71,18 @@ docker build $ARGS -t bidms/kerberos:latest imageFiles || check_exit
 
 #
 # We want to temporarily start up the image so we can copy the contents of
-# /etc/krb5kdc to the host.  On subsequent container runs, we will mount
+# /v1 to the host.  On subsequent container runs, we will mount
 # this host directory into the container.  i.e., we want to persist Kerberos
 # data files across container runs.
 #
-if [ ! -z "$HOST_KERBEROS_DIRECTORY" ]; then
-  if [ -e $HOST_KERBEROS_DIRECTORY ]; then
-    echo "$HOST_KERBEROS_DIRECTORY on the host already exists.  Not copying anything."
-    echo "If you want a clean install, delete $HOST_KERBEROS_DIRECTORY and re-run this script."
+if [ ! -z "$HOST_VOLUME_DIRECTORY" ]; then
+  if [ -e $HOST_VOLUME_DIRECTORY ]; then
+    echo "$HOST_VOLUME_DIRECTORY on the host already exists.  Not copying anything."
+    echo "If you want a clean install, delete $HOST_VOLUME_DIRECTORY and re-run this script."
     exit
   fi
-  echo "Temporarily starting the container to copy /etc/krb5kdc to host"
-  NO_INTERACTIVE="true" NO_HOST_KERBEROS_DIRECTORY="true" ./runContainer.sh || check_exit
+  echo "Temporarily starting the container to copy /v1 to host"
+  NO_INTERACTIVE="true" NO_HOST_VOLUME_DIRECTORY="true" ./runContainer.sh || check_exit
   TMP_VOLUME_HOST_DIR=$(./getKerberosHostDir.sh)
   if [[ $? != 0 || -z "$TMP_VOLUME_HOST_DIR" ]]; then
     echo "./getKerberosHostDir.sh failed"
@@ -92,16 +92,16 @@ if [ ! -z "$HOST_KERBEROS_DIRECTORY" ]; then
   fi
 
   echo "Temporary host Kerberos directory: $TMP_VOLUME_HOST_DIR"
-  echo "$HOST_KERBEROS_DIRECTORY does not yet exist.  Copying from temporary location."
+  echo "$HOST_VOLUME_DIRECTORY does not yet exist.  Copying from temporary location."
   echo "You must have sudo access for this to work and you may be prompted for a sudo password."
-  sudo cp -pr $TMP_VOLUME_HOST_DIR $HOST_KERBEROS_DIRECTORY
+  sudo cp -pr $TMP_VOLUME_HOST_DIR $HOST_VOLUME_DIRECTORY
   if [ $? != 0 ]; then
-    echo "copy from $TMP_VOLUME_HOST_DIR to $HOST_KERBEROS_DIRECTORY failed"
+    echo "copy from $TMP_VOLUME_HOST_DIR to $HOST_VOLUME_DIRECTORY failed"
     echo "Stopping the container."
     docker stop bidms-kerberos
     exit 1
   fi
-  echo "Successfully copied to $HOST_KERBEROS_DIRECTORY"
+  echo "Successfully copied to $HOST_VOLUME_DIRECTORY"
   
   echo "Stopping the container."
   docker stop bidms-kerberos || check_exit

@@ -51,6 +51,8 @@ RUN sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /etc/krb5.conf \
 
 COPY tmp_passwords/ /tmp/tmp_passwords/
 
+RUN mkdir -p /v1/krb5kdc/etc /v1/krb5kdc/var
+
 # Initialize the KDC database
 RUN if [ -f /tmp/tmp_passwords/kdc_master_pw ]; then \
        echo "Using KDC master password from tmp_passwords/kdc_master_pw"; \
@@ -92,4 +94,4 @@ EXPOSE 88/udp
 
 # Use 'docker inspect <name>' to find the volume files on the host.
 # <name> is the value of the --name parameter when invoking docker run.
-VOLUME /etc/krb5kdc
+VOLUME /v1

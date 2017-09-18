@@ -38,6 +38,8 @@ RUN set -x \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /core
 
+RUN mkdir /var/log/kerberos
+
 COPY etc/krb5.conf /etc
 COPY etc/krb5kdc/* /etc/krb5kdc/
 
@@ -77,6 +79,30 @@ RUN if [ -f /tmp/tmp_passwords/kdc_admin_pw ]; then \
   && sed -i "s#KDC_ADMIN_PW_FILE#$KDC_ADMIN_PW_FILE#" /tmp/tmp_passwords/add_admin_princ.exp \
   && expect -f /tmp/tmp_passwords/add_admin_princ.exp
 
+# Add add/admin principal
+RUN if [ -f /tmp/tmp_passwords/kdc_add_admin_pw ]; then \
+       echo "Using KDC add_admin password from tmp_passwords/kdc_add_admin_pw"; \
+       KDC_ADD_ADMIN_PW_FILE=/tmp/tmp_passwords/kdc_add_admin_pw; \
+     else \
+       echo "Using default insecure KDC add_admin password from tmp_passwords/kdc_add_admin_pw.template"; \
+       KDC_ADD_ADMIN_PW_FILE=/tmp/tmp_passwords/kdc_add_admin_pw.template; \
+     fi \
+  && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/add_add_admin_princ.exp \
+  && sed -i "s#KDC_ADD_ADMIN_PW_FILE#$KDC_ADD_ADMIN_PW_FILE#" /tmp/tmp_passwords/add_add_admin_princ.exp \
+  && expect -f /tmp/tmp_passwords/add_add_admin_princ.exp
+
+# Add chpw/admin principal
+RUN if [ -f /tmp/tmp_passwords/kdc_chpw_admin_pw ]; then \
+       echo "Using KDC chpw_admin password from tmp_passwords/kdc_chpw_admin_pw"; \
+       KDC_CHPW_ADMIN_PW_FILE=/tmp/tmp_passwords/kdc_chpw_admin_pw; \
+     else \
+       echo "Using default insecure KDC chpw_admin password from tmp_passwords/kdc_chpw_admin_pw.template"; \
+       KDC_CHPW_ADMIN_PW_FILE=/tmp/tmp_passwords/kdc_chpw_admin_pw.template; \
+     fi \
+  && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/add_chpw_admin_princ.exp \
+  && sed -i "s#KDC_CHPW_ADMIN_PW_FILE#$KDC_CHPW_ADMIN_PW_FILE#" /tmp/tmp_passwords/add_chpw_admin_princ.exp \
+  && expect -f /tmp/tmp_passwords/add_chpw_admin_princ.exp
+
 RUN set -x \
   && export DEBIAN_FRONTEND=noninteractive \
   && apt-get purge -y expect \
@@ -85,8 +111,6 @@ RUN set -x \
   && rm -rf /var/lib/apt/lists/* /tmp/* /core
 
 RUN rm -rf /tmp/tmp_passwords
-
-RUN mkdir /var/log/kerberos
 
 COPY etc/container/ /etc/container/
 ENTRYPOINT ["/etc/container/krb-entrypoint.sh", "interactive"]

@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+
+set force_conservative 0  ;# set to 1 to force conservative mode even if
+			  ;# script wasn't run conservatively originally
+if {$force_conservative} {
+	set send_slow {1 .1}
+	proc send {ignore arg} {
+		sleep .1
+		exp_send -s -- $arg
+	}
+}
+
+# Read password from file
+set f [open "KDC_CHPW_ADMIN_PW_FILE"]
+set password [read $f]
+close $f
+
+set timeout -1
+spawn /bin/bash -c "(/usr/sbin/kadmin.local addprinc chpw/admin && /bin/echo Successful)"
+match_max 100000
+expect -exact "Enter password for principal \"chpw/admin@EXAMPLE.COM\": "
+send -- "$password\r"
+expect -exact "\r
+Re-enter password for principal \"chpw/admin@EXAMPLE.COM\": "
+send -- "$password\r"
+expect -exact "Successful\r"
+expect eof

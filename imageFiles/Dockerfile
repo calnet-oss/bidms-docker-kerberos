@@ -91,6 +91,7 @@ ENTRYPOINT ["/etc/container/krb-entrypoint.sh", "interactive"]
 
 EXPOSE 750/udp
 EXPOSE 88/udp
+EXPOSE 749/tcp
 
 # Use 'docker inspect <name>' to find the volume files on the host.
 # <name> is the value of the --name parameter when invoking docker run.

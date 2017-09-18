@@ -53,8 +53,9 @@ Or to run the container detached, in the background:
 ./detachedRunContainer.sh
 ```
 
-If everything goes smoothly, the container should expose Kerberos ports 88/udp and
-750/udp to the docker network configured in `config.env`.
+If everything goes smoothly, the container should expose Kerberos ports
+88/udp and 750/udp to the docker network configured in `config.env`. 
+749/tcp is also exposed for the kadmin server.
 
 You can then use Kerberos clients operating within the docker network to
 connect to the KDC.

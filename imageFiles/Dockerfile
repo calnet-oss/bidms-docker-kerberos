@@ -86,6 +86,8 @@ RUN set -x \
 
 RUN rm -rf /tmp/tmp_passwords
 
+RUN mkdir /var/log/kerberos
+
 COPY etc/container/ /etc/container/
 ENTRYPOINT ["/etc/container/krb-entrypoint.sh", "interactive"]
 

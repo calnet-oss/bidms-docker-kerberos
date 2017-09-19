@@ -16,7 +16,7 @@ set password [read $f]
 close $f
 
 set timeout -1
-spawn /bin/bash -c "(/usr/sbin/kadmin.local addprinc add/admin && /bin/echo Successful)"
+spawn /bin/bash -c "(/usr/sbin/kadmin.local addprinc -policy default add/admin && /bin/echo Successful)"
 match_max 100000
 expect -exact "Enter password for principal \"add/admin@EXAMPLE.COM\": "
 send -- "$password\r"

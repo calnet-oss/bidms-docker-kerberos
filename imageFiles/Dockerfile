@@ -53,7 +53,8 @@ RUN sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /etc/krb5.conf \
 
 COPY tmp_passwords/ /tmp/tmp_passwords/
 
-RUN mkdir -p /v1/krb5kdc/etc /v1/krb5kdc/var
+RUN mkdir -p /v1/krb5kdc/etc /v1/krb5kdc/var /v1/private \
+  && chmod 750 /v1/private
 
 # Initialize the KDC database
 RUN if [ -f /tmp/tmp_passwords/kdc_master_pw ]; then \
@@ -66,6 +67,9 @@ RUN if [ -f /tmp/tmp_passwords/kdc_master_pw ]; then \
   && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/create_realm.exp \
   && sed -i "s#KDC_MASTER_PW_FILE#$KDC_MASTER_PW_FILE#" /tmp/tmp_passwords/create_realm.exp \
   && expect -f /tmp/tmp_passwords/create_realm.exp
+
+# Add default policy
+RUN kadmin.local addpol -maxlife 0 -minlife 0 -minlength 9 -minclasses 3 -history 2 -maxfailure 10 -failurecountinterval 00:05:00 -lockoutduration 00:15:00 default
 
 # Add the admin/admin principal
 RUN if [ -f /tmp/tmp_passwords/kdc_admin_pw ]; then \
@@ -89,7 +93,8 @@ RUN if [ -f /tmp/tmp_passwords/kdc_add_admin_pw ]; then \
      fi \
   && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/add_add_admin_princ.exp \
   && sed -i "s#KDC_ADD_ADMIN_PW_FILE#$KDC_ADD_ADMIN_PW_FILE#" /tmp/tmp_passwords/add_add_admin_princ.exp \
-  && expect -f /tmp/tmp_passwords/add_add_admin_princ.exp
+  && expect -f /tmp/tmp_passwords/add_add_admin_princ.exp \
+  && kadmin.local ktadd -norandkey -k /v1/private/add-admin.keytab add/admin
 
 # Add chpw/admin principal
 RUN if [ -f /tmp/tmp_passwords/kdc_chpw_admin_pw ]; then \
@@ -101,14 +106,15 @@ RUN if [ -f /tmp/tmp_passwords/kdc_chpw_admin_pw ]; then \
      fi \
   && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/add_chpw_admin_princ.exp \
   && sed -i "s#KDC_CHPW_ADMIN_PW_FILE#$KDC_CHPW_ADMIN_PW_FILE#" /tmp/tmp_passwords/add_chpw_admin_princ.exp \
-  && expect -f /tmp/tmp_passwords/add_chpw_admin_princ.exp
+  && expect -f /tmp/tmp_passwords/add_chpw_admin_princ.exp \
+  && kadmin.local ktadd -norandkey -k /v1/private/chpw-admin.keytab chpw/admin
 
 RUN set -x \
   && export DEBIAN_FRONTEND=noninteractive \
   && apt-get purge -y expect \
   && apt-get -y autoremove \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /core
+  && rm -rf /var/lib/apt/lists/* /core
 
 RUN rm -rf /tmp/tmp_passwords
 
@@ -122,3 +128,5 @@ EXPOSE 749/tcp
 # Use 'docker inspect <name>' to find the volume files on the host.
 # <name> is the value of the --name parameter when invoking docker run.
 VOLUME /v1
+
+RUN rm -f /core

@@ -109,6 +109,19 @@ RUN if [ -f /tmp/tmp_passwords/kdc_chpw_admin_pw ]; then \
   && expect -f /tmp/tmp_passwords/add_chpw_admin_princ.exp \
   && kadmin.local ktadd -norandkey -k /v1/private/chpw-admin.keytab chpw/admin
 
+# Add krbproxy/ucb-krbservice principal -- only needed at UCB
+RUN if [ -f /tmp/tmp_passwords/kdc_krbproxy_krbservice_pw ]; then \
+       echo "Using KDC krbproxy-krbservice password from tmp_passwords/kdc_krbproxy_krbservice_pw"; \
+       KDC_KRBPROXY_KRBSERVICE_PW_FILE=/tmp/tmp_passwords/kdc_krbproxy_krbservice_pw; \
+     else \
+       echo "Using default insecure KDC krbproxy-krbservice password from tmp_passwords/kdc_krbproxy_krbservice_pw.template"; \
+       KDC_KRBPROXY_KRBSERVICE_PW_FILE=/tmp/tmp_passwords/kdc_krbproxy_krbservice_pw.template; \
+     fi \
+  && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/add_krbproxy-krbservice_princ.exp \
+  && sed -i "s#KDC_KRBPROXY_KRBSERVICE_PW_FILE#$KDC_KRBPROXY_KRBSERVICE_PW_FILE#" /tmp/tmp_passwords/add_krbproxy-krbservice_princ.exp \
+  && expect -f /tmp/tmp_passwords/add_krbproxy-krbservice_princ.exp \
+  && kadmin.local ktadd -norandkey -k /v1/private/krbproxy-krbservice.keytab chpw/admin
+
 RUN set -x \
   && export DEBIAN_FRONTEND=noninteractive \
   && apt-get purge -y expect \

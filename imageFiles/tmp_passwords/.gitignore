@@ -2,3 +2,4 @@ kdc_admin_pw
 kdc_master_pw
 kdc_add_admin_pw
 kdc_chpw_admin_pw
+kdc_krbproxy_krbservice_pw

@@ -120,7 +120,7 @@ RUN if [ -f /tmp/tmp_passwords/kdc_krbproxy_krbservice_pw ]; then \
   && sed -i "s/EXAMPLE\.COM/$KRB_REALM/" /tmp/tmp_passwords/add_krbproxy-krbservice_princ.exp \
   && sed -i "s#KDC_KRBPROXY_KRBSERVICE_PW_FILE#$KDC_KRBPROXY_KRBSERVICE_PW_FILE#" /tmp/tmp_passwords/add_krbproxy-krbservice_princ.exp \
   && expect -f /tmp/tmp_passwords/add_krbproxy-krbservice_princ.exp \
-  && kadmin.local ktadd -norandkey -k /v1/private/krbproxy-krbservice.keytab chpw/admin
+  && kadmin.local ktadd -norandkey -k /v1/private/krbproxy-krbservice.keytab krbproxy/ucb-krbservice
 
 RUN set -x \
   && export DEBIAN_FRONTEND=noninteractive \
